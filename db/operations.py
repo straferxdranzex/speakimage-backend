@@ -4,7 +4,6 @@ from bson.objectid import ObjectId
 from db.model import MODEL
 from db.utils import get_curr_timestamp
 
-
 class DB_OPERATOR:
     def __init__(self) -> None:
         self.chat_db = MODEL("visual-gpt-dev", "chats")
@@ -126,4 +125,15 @@ class DB_OPERATOR:
             return chats
         except Exception as e:
             logging.error(f"Error fetching chats for user_id: {str(e)}")
+            return None
+
+    def get_user_by_id(self, user_id):
+        try:
+            with self.user_db:
+                user = self.user_db.find_document({"_id": user_id})
+                if user:
+                    user["_id"] = str(user["_id"])
+            return user
+        except Exception as e:
+            logging.error(f"Error fetching user by ID: {str(e)}")
             return None
