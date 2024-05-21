@@ -6,7 +6,7 @@ import requests
 from datetime import timedelta
 from dotenv import load_dotenv
 from flask_cors import CORS
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from db.operations import DB_OPERATOR
 from db.utils import get_curr_timestamp
@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to debug for detai
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
@@ -37,7 +37,9 @@ client = openai
 @app.route("/api/health", methods=["GET"])
 def health_check():
     logging.debug("Health check endpoint was called.")
-    return jsonify({"status": "healthy"}), 200
+    response = make_response(jsonify({"status": "healthy"}))
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response, 200
 
 
 @app.route("/")
