@@ -19,7 +19,6 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["https://www.speakimage.ai", "http://localhost:3000"])
 
-
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
@@ -34,7 +33,6 @@ IMG_SIZE = "1024x1024"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = openai
 
-
 @app.route("/api/health", methods=["GET"])
 def health_check():
     logging.debug("Health check endpoint was called.")
@@ -42,11 +40,9 @@ def health_check():
     response.headers["Access-Control-Allow-Credentials"] = "true"
     return response, 200
 
-
 @app.route("/")
 def home():
     return jsonify({"message": "Welcome to the Speak Image Backend!"})
-
 
 def analyse_query(query):
     tools = [
@@ -99,7 +95,6 @@ def analyse_query(query):
     )
     return response
 
-
 def call_tool_funcs(tool_calls):
     outputs = {}
     for tool_call in tool_calls:
@@ -117,7 +112,6 @@ def call_tool_funcs(tool_calls):
                     continue
     return outputs
 
-
 def get_answer(query):
     messages = [
         {
@@ -131,7 +125,6 @@ def get_answer(query):
     logging.debug(f"MESSAGE: {response_message}")
     return response_message.content
 
-
 def get_video_from_pixabay(description):
     url = f"https://pixabay.com/api/videos/?key={app.config['PIXABAY_API_KEY']}&q={description}"
     response = requests.get(url)
@@ -139,7 +132,6 @@ def get_video_from_pixabay(description):
     if out.get("hits"):
         return out["hits"][0]["videos"]["medium"]["url"]
     return None
-
 
 def get_image_from_pixabay(description):
     url = f"https://pixabay.com/api/?key={app.config['PIXABAY_API_KEY']}&q={description}&image_type=photo"
@@ -150,7 +142,6 @@ def get_image_from_pixabay(description):
         return large_img_url if large_img_url else out["hits"][0]["imageURL"]
     return None
 
-
 def generate_image(description):
     response = client.images.generate(
         model=DALL_E_MODEL, prompt=description, size=IMG_SIZE, n=1, quality="standard"
@@ -159,7 +150,6 @@ def generate_image(description):
     pixabay_img_url = get_image_from_pixabay(description)
     video_url = get_video_from_pixabay(description)
     return gpt_image_url, pixabay_img_url, video_url
-
 
 def chat(user_query):
     response = analyse_query(user_query)
@@ -185,7 +175,6 @@ def chat(user_query):
     }
     return {"response": res_out}
 
-
 @app.route("/api/init-chat", methods=["POST"])
 def init_chat():
     user_query = request.json.get("query")
@@ -206,7 +195,6 @@ def init_chat():
         logging.debug(f"Thread ID: {thread_id}")
         return jsonify({"response": res_out["response"], "thread_id": thread_id}), 200
     return jsonify(res_out), 500
-
 
 @app.route("/api/generate-answer", methods=["POST"])
 def generate_answer():
@@ -231,7 +219,6 @@ def generate_answer():
         logging.error(f"API request failed: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-
 @app.route("/api/history", methods=["POST"])
 def chat_history():
     thread_id = request.json.get("thread_id")
@@ -239,7 +226,6 @@ def chat_history():
     if conversation:
         return jsonify(conversation), 200
     return jsonify({"error": "Chat history not found"}), 404
-
 
 @app.route("/api/clear-history", methods=["POST"])
 def clear_history():
@@ -249,13 +235,11 @@ def clear_history():
         return jsonify({"message": "Chat history cleared"}), 200
     return jsonify({"error": "Chat history not found"}), 404
 
-
 @app.route("/api/delete-chat", methods=["POST"])
 def delete_chat():
     thread_id = request.json.get("thread_id")
     DBOPR.delete_chat(thread_id)
     return jsonify({"message": "chat deleted"}), 200
-
 
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -271,7 +255,6 @@ def signup():
         DBOPR.create_user(email, hashed_password, full_name)
         return jsonify({"message": "User created successfully"}), 201
     return jsonify({"error": "Invalid data"}), 400
-
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -304,12 +287,10 @@ def login():
         logging.error("Invalid data received in request")
         return jsonify({"error": "Invalid data"}), 400
 
-
 @app.route("/logout", methods=["POST"])
 def logout():
     session.pop("username", None)
     return jsonify({"message": "Logged out successfully"}), 200
-
 
 @app.route("/api/get-users", methods=["GET"])
 def get_users():
@@ -323,11 +304,10 @@ def get_users():
         logging.error(f"Exception in /api/get-users: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
-
-@app.route("/api/get-chats/<client_id>", methods=["GET"])
-def get_chats(client_id):
+@app.route("/api/get-chats/<user_id>", methods=["GET"])
+def get_chats(user_id):
     try:
-        chats = DBOPR.get_chats_by_user_id(client_id)
+        chats = DBOPR.get_chats_by_user_id(user_id)
         if chats is not None:
             return jsonify(chats), 200
         else:
@@ -335,7 +315,6 @@ def get_chats(client_id):
     except Exception as e:
         logging.error(f"Exception in /api/get-chats: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
-
 
 @app.route("/api/get-chat/<chat_id>", methods=["GET"])
 def get_chat_by_id(chat_id):
@@ -346,7 +325,6 @@ def get_chat_by_id(chat_id):
     else:
         return jsonify({"error": "Chat not found"}), 404
 
-
 @app.route("/api/get-user-chats/<user_id>", methods=["GET"])
 def get_user_chats(user_id):
     logging.debug(f"Fetching chats for user_id: {user_id}")
@@ -356,19 +334,19 @@ def get_user_chats(user_id):
     else:
         return jsonify({"error": "Chats not found"}), 404
 
-
-@app.route("/api/get-user/<client_id>", methods=["GET"])
-def get_user(client_id):
+@app.route("/api/get-user/<user_id>", methods=["GET"])
+def get_user(user_id):
     try:
-        user = DBOPR.get_user_by_id(client_id)
+        user = DBOPR.get_user_by_id(user_id)
         if user is not None:
+            logging.debug(f"User found: {user}")
             return jsonify(user), 200
         else:
+            logging.warning(f"User not found with ID: {user_id}")
             return jsonify({"error": "User not found"}), 404
     except Exception as e:
         logging.error(f"Exception in /api/get-user: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True)
