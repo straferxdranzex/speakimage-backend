@@ -6,6 +6,14 @@
       "use": "@vercel/python"
     }
   ],
+  "functions": {
+    "api/*": {
+      "timeout": 30
+    },
+    "*": {
+      "timeout": 30
+    }
+  },
   "routes": [
     {
       "src": "/api/(.*)",
