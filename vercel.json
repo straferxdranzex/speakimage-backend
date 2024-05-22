@@ -28,6 +28,10 @@
   "build": {
     "env": {
       "PIP_NO_BINARY": ":all:"
-    }
+    },
+    "commands": [
+      "pip install -r requirements-build.txt",
+      "pip install -r requirements.txt"
+    ]
   }
 }
