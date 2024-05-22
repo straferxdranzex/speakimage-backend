@@ -18,7 +18,6 @@
   "build": {
     "env": {
       "PIP_NO_BINARY": ":all:"
-    },
-    "cmd": "pip install --disable-pip-version-check --target . --upgrade -r requirements-build.txt && pip install --disable-pip-version-check --target . --upgrade -r requirements.txt"
+    }
   }
 }
