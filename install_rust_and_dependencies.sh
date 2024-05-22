@@ -9,5 +9,5 @@ source $HOME/.cargo/env
 # Upgrade pip
 pip install --upgrade pip
 
-# Install dependencies
-pip install --disable-pip-version-check --target . --upgrade -r requirements.txt
+# Install dependencies without building maturin from source
+PIP_NO_BINARY=maturin pip install --disable-pip-version-check --target . --upgrade -r requirements.txt
