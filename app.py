@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to debug for detai
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://www.speakimage.ai"]) 
+CORS(app, resources={r"/*": {"origins": "https://www.speakimage.ai"}})
 
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
@@ -370,4 +370,4 @@ def get_user(user_id):
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host="0.0.0.0", port=5000)
