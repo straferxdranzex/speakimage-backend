@@ -3,23 +3,22 @@
   "builds": [
     {
       "src": "app.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.10"
+      }
     }
   ],
-  "functions": {
-    "app/api/**/*": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/app.py"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/app.py"
+      "dest": "app.py"
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "PIP_NO_BINARY": ":all:"
+    },
+    "cmd": "pip install --disable-pip-version-check --target . --upgrade -r requirements-build.txt && pip install --disable-pip-version-check --target . --upgrade -r requirements.txt"
+  }
 }
