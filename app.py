@@ -5,7 +5,7 @@ import logging
 import requests
 from datetime import timedelta
 from dotenv import load_dotenv
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask import Flask, request, jsonify, session, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from db.operations import DB_OPERATOR
@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to debug for detai
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://www.speakimage.ai", "http://localhost:3000"])
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": ["https://www.speakimage.ai", "http://localhost:3000"]}})
 
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
@@ -34,6 +34,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 client = openai
 
 @app.route("/api/health", methods=["GET"])
+@cross_origin()
 def health_check():
     logging.debug("Health check endpoint was called.")
     response = make_response(jsonify({"status": "healthy"}))
@@ -41,6 +42,7 @@ def health_check():
     return response, 200
 
 @app.route("/")
+@cross_origin()
 def home():
     return jsonify({"message": "Welcome to the Speak Image Backend!"})
 
@@ -176,6 +178,7 @@ def chat(user_query):
     return {"response": res_out}
 
 @app.route("/api/init-chat", methods=["POST"])
+@cross_origin()
 def init_chat():
     user_query = request.json.get("query")
     title_words = user_query.split(" ")[:5]
@@ -197,6 +200,7 @@ def init_chat():
     return jsonify(res_out), 500
 
 @app.route("/api/generate-answer", methods=["POST"])
+@cross_origin()
 def generate_answer():
     user_query = request.json.get("query")
     thread_id = request.json.get("thread_id")
@@ -220,6 +224,7 @@ def generate_answer():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/history", methods=["POST"])
+@cross_origin()
 def chat_history():
     thread_id = request.json.get("thread_id")
     conversation = DBOPR.get_history(thread_id)
@@ -228,6 +233,7 @@ def chat_history():
     return jsonify({"error": "Chat history not found"}), 404
 
 @app.route("/api/clear-history", methods=["POST"])
+@cross_origin()
 def clear_history():
     thread_id = request.json.get("thread_id")
     success = DBOPR.clear_history(thread_id)
@@ -236,12 +242,14 @@ def clear_history():
     return jsonify({"error": "Chat history not found"}), 404
 
 @app.route("/api/delete-chat", methods=["POST"])
+@cross_origin()
 def delete_chat():
     thread_id = request.json.get("thread_id")
     DBOPR.delete_chat(thread_id)
     return jsonify({"message": "chat deleted"}), 200
 
 @app.route("/signup", methods=["POST"])
+@cross_origin()
 def signup():
     data = request.get_json()
     email = data.get("email")
@@ -257,6 +265,7 @@ def signup():
     return jsonify({"error": "Invalid data"}), 400
 
 @app.route("/login", methods=["POST"])
+@cross_origin()
 def login():
     data = request.get_json()
     logging.debug(f"Received login data: {data}")
@@ -288,11 +297,13 @@ def login():
         return jsonify({"error": "Invalid data"}), 400
 
 @app.route("/logout", methods=["POST"])
+@cross_origin()
 def logout():
     session.pop("username", None)
     return jsonify({"message": "Logged out successfully"}), 200
 
 @app.route("/api/get-users", methods=["GET"])
+@cross_origin()
 def get_users():
     try:
         users = DBOPR.get_users()
@@ -305,6 +316,7 @@ def get_users():
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route("/api/get-chats/<user_id>", methods=["GET"])
+@cross_origin()
 def get_chats(user_id):
     try:
         chats = DBOPR.get_chats_by_user_id(user_id)
@@ -317,6 +329,7 @@ def get_chats(user_id):
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route("/api/get-chat/<chat_id>", methods=["GET"])
+@cross_origin()
 def get_chat_by_id(chat_id):
     logging.debug(f"Fetching chat with ID: {chat_id}")
     chat = DBOPR.get_chat_by_id(chat_id)
@@ -326,6 +339,7 @@ def get_chat_by_id(chat_id):
         return jsonify({"error": "Chat not found"}), 404
 
 @app.route("/api/get-user-chats/<user_id>", methods=["GET"])
+@cross_origin()
 def get_user_chats(user_id):
     logging.debug(f"Fetching chats for user_id: {user_id}")
     chats = DBOPR.get_chats_by_user_id(user_id)
@@ -335,6 +349,7 @@ def get_user_chats(user_id):
         return jsonify({"error": "Chats not found"}), 404
 
 @app.route("/api/get-user/<user_id>", methods=["GET"])
+@cross_origin()
 def get_user(user_id):
     try:
         user = DBOPR.get_user_by_id(user_id)
