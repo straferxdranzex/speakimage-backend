@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure this script is executable
+chmod +x $0
+
 # Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
