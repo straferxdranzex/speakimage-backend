@@ -6,7 +6,7 @@
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.10",
-        "installCommand": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source $HOME/.cargo/env && pip3.12 install --disable-pip-version-check --target . --upgrade -r requirements.txt"
+        "installCommand": "sh install_rust_and_dependencies.sh"
       }
     }
   ],
