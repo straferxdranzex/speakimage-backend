@@ -18,7 +18,7 @@
   ],
   "build": {
     "env": {
-      "PIP_NO_BINARY": ":all:"
+      "PIP_NO_BINARY": ":maturin:"
     }
   }
 }
