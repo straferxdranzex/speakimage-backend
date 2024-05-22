@@ -16,6 +16,11 @@
       "dest": "app.py"
     }
   ],
+  "functions": {
+    "api/*.py": {
+      "maxDuration": 60
+    }
+  },
   "build": {
     "env": {
       "PIP_NO_BINARY": ":maturin:"
