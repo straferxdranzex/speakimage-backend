@@ -17,11 +17,14 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to debug for detai
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["http://your-frontend-domain.com"])  # Specify your frontend domain
 
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["SESSION_COOKIE_HTTPONLY"] = False
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 app.config["PIXABAY_API_KEY"] = os.getenv("PIXABAY_API_KEY")
 
@@ -285,7 +288,10 @@ def login():
                 session["email"] = email
                 user_id = user["_id"]  # Get the user_id
                 logging.debug(f"Login successful for user_id: {user_id}")
-                return jsonify({"message": "Login successful", "user_id": user_id}), 200
+                response = jsonify({"message": "Login successful", "user_id": user_id})
+                response.headers["Access-Control-Allow-Credentials"] = "true"
+                response.headers["Access-Control-Allow-Origin"] = request.headers.get("Origin")
+                return response, 200
             else:
                 logging.warning("Invalid password provided")
                 return jsonify({"error": "Invalid credentials"}), 401
