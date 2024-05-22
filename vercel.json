@@ -1,28 +1,30 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python",
-      "config": {
-        "runtime": "python3.10"
-      }
-    }
-  ],
-  "functions": {
-    "api/**/*": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "app.py"
+    "version": 2,
+    "builds": [
+        {
+            "src": "app.py",
+            "use": "@vercel/python",
+            "config": {
+                "runtime": "python3.10"
+            }
+        }
+    ],
+    "functions": {
+        "api/**/*": {
+            "maxDuration": 60,
+            "memory": 1024
+        }
     },
-    {
-      "src": "/(.*)",
-      "dest": "app.py"
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "app.py"
+        }
+    ],
+    "build": {
+        "env": {
+            "PIP_NO_BINARY": ":all:"
+        },
+        "cmd": "pip install --disable-pip-version-check --target . --upgrade -r requirements-build.txt && pip install --disable-pip-version-check --target . --upgrade -r requirements.txt"
     }
-  ]
 }
