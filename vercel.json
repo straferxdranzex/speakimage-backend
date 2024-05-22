@@ -6,13 +6,10 @@
       "use": "@vercel/python"
     }
   ],
-{
   "functions": {
     "app/api/**/*": {
-      "maxDuration": 60 // All functions can run for a maximum of 5 seconds
+      "maxDuration": 60 
     }
-  }
-}
   },
   "routes": [
     {
