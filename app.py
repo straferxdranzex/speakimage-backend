@@ -255,32 +255,34 @@ def delete_chat():
 @cross_origin(origins="https://www.speakimage.ai", supports_credentials=True)
 def signup():
     if request.method == "OPTIONS":
-        # Create a response for the preflight request
-        response = current_app.make_default_options_response()
-    else:
-        data = request.get_json()
-        logging.debug('Data received: %s', data)
-        email = data.get("email")
-        password = data.get("password")
-        full_name = data.get("full_name")
-
-        if email and password and full_name:
-            existing_user = DBOPR.find_user(email)
-            if existing_user:
-                return jsonify({"error": "User already exists"}), 409
+        # Handle preflight request for CORS
+        return current_app.make_default_options_response()
+    
+    data = request.get_json()
+    logging.debug('Data received: %s', data)
+    email = data.get("email")
+    password = data.get("password")
+    full_name = data.get("full_name")
+    
+    if email and password and full_name:
+        existing_user = DBOPR.find_user(email)
+        if existing_user:
+            response = jsonify({"error": "User already exists"}), 409
+        else:
             hashed_password = generate_password_hash(password)
             DBOPR.create_user(email, hashed_password, full_name)
             response = jsonify({"message": "User created successfully"}), 201
+    else:
+        response = jsonify({"error": "Invalid data"}), 400
 
-        else:
-            response = jsonify({"error": "Invalid data"}), 400
-
-    # Set necessary CORS headers
+    # Ensure the response is a response object before adding headers
+    response = make_response(response)
     response.headers['Access-Control-Allow-Origin'] = 'https://www.speakimage.ai'
     response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
+
 
 @app.route("/login", methods=["POST"])
 @cross_origin()
