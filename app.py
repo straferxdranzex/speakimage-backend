@@ -36,7 +36,6 @@ IMG_SIZE = "1024x1024"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = openai
 
-
 @app.route("/api/health", methods=["GET"])
 @cross_origin()
 def health_check():
