@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to debug for detai
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["https://www.speakimage.ai"])
 
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
@@ -251,22 +251,36 @@ def delete_chat():
     DBOPR.delete_chat(thread_id)
     return jsonify({"message": "chat deleted"}), 200
 
-@app.route("/signup", methods=["POST"])
-@cross_origin()
+@app.route("/signup", methods=["POST", "OPTIONS"])
+@cross_origin(origins="https://www.speakimage.ai", supports_credentials=True)
 def signup():
-    data = request.get_json()
-    logging.debug('Data received: %s', data)
-    email = data.get("email")
-    password = data.get("password")
-    full_name = data.get("full_name")
-    if email and password and full_name:
-        existing_user = DBOPR.find_user(email)
-        if existing_user:
-            return jsonify({"error": "User already exists"}), 409
-        hashed_password = generate_password_hash(password)
-        DBOPR.create_user(email, hashed_password, full_name)
-        return jsonify({"message": "User created successfully"}), 201
-    return jsonify({"error": "Invalid data"}), 400
+    if request.method == "OPTIONS":
+        # Create a response for the preflight request
+        response = current_app.make_default_options_response()
+    else:
+        data = request.get_json()
+        logging.debug('Data received: %s', data)
+        email = data.get("email")
+        password = data.get("password")
+        full_name = data.get("full_name")
+
+        if email and password and full_name:
+            existing_user = DBOPR.find_user(email)
+            if existing_user:
+                return jsonify({"error": "User already exists"}), 409
+            hashed_password = generate_password_hash(password)
+            DBOPR.create_user(email, hashed_password, full_name)
+            response = jsonify({"message": "User created successfully"}), 201
+
+        else:
+            response = jsonify({"error": "Invalid data"}), 400
+
+    # Set necessary CORS headers
+    response.headers['Access-Control-Allow-Origin'] = 'https://www.speakimage.ai'
+    response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
 
 @app.route("/login", methods=["POST"])
 @cross_origin()
