@@ -255,6 +255,7 @@ def delete_chat():
 @cross_origin()
 def signup():
     data = request.get_json()
+    logging.debug('Data received: %s', data)
     email = data.get("email")
     password = data.get("password")
     full_name = data.get("full_name")
