@@ -37,13 +37,6 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 client = openai
 
 
-@app.route('/example')
-def example_route():
-    response = jsonify({'message': 'This is a test'})
-    response.headers.add('Access-Control-Allow-Origin', 'https://www.speakimage.ai')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
-
 @app.route("/api/health", methods=["GET"])
 @cross_origin()
 def health_check():
