@@ -12,7 +12,7 @@ from db.operations import DB_OPERATOR
 from db.utils import get_curr_timestamp
 from prompt import PROMPT_TO_ANALYSE_QUERY
 
-logging.basicConfig(level=logging.DEBUG)  # Set logging level to debug for detailed logs
+logging.basicConfig(level=logging.DEBUG) 
 
 load_dotenv()
 
@@ -35,6 +35,7 @@ IMG_SIZE = "1024x1024"
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = openai
+
 
 @app.route("/api/health", methods=["GET"])
 @cross_origin()
@@ -251,38 +252,22 @@ def delete_chat():
     DBOPR.delete_chat(thread_id)
     return jsonify({"message": "chat deleted"}), 200
 
-@app.route("/signup", methods=["POST", "OPTIONS"])
-@cross_origin(origins="https://www.speakimage.ai", supports_credentials=True)
+@app.route("/signup", methods=["POST"])
+@cross_origin()
 def signup():
-    if request.method == "OPTIONS":
-        # Handle preflight request for CORS
-        return current_app.make_default_options_response()
-    
     data = request.get_json()
     logging.debug('Data received: %s', data)
     email = data.get("email")
     password = data.get("password")
     full_name = data.get("full_name")
-    
     if email and password and full_name:
         existing_user = DBOPR.find_user(email)
         if existing_user:
-            response = jsonify({"error": "User already exists"}), 409
-        else:
-            hashed_password = generate_password_hash(password)
-            DBOPR.create_user(email, hashed_password, full_name)
-            response = jsonify({"message": "User created successfully"}), 201
-    else:
-        response = jsonify({"error": "Invalid data"}), 400
-
-    # Ensure the response is a response object before adding headers
-    response = make_response(response)
-    response.headers['Access-Control-Allow-Origin'] = 'https://www.speakimage.ai'
-    response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
-    return response
-
+            return jsonify({"error": "User already exists"}), 409
+        hashed_password = generate_password_hash(password)
+        DBOPR.create_user(email, hashed_password, full_name)
+        return jsonify({"message": "User created successfully"}), 201
+    return jsonify({"error": "Invalid data"}), 400
 
 @app.route("/login", methods=["POST"])
 @cross_origin()
