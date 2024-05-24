@@ -17,11 +17,7 @@ logging.basicConfig(level=logging.DEBUG)  # Set logging level to debug for detai
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, resources={r"/*": {
-    "origins": ["https://www.speakimage.ai"],
-    "allow_headers": ["Authorization", "Content-Type", "Access-Control-Allow-Credentials"],
-    "methods": ["GET", "POST", "OPTIONS"]
-}})
+CORS(app, resources={r"/api/*": {"origins": ["https://www.speakimage.ai"]}}, supports_credentials=True)
 
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
