@@ -41,7 +41,6 @@ client = openai
 def health_check():
     logging.debug("Health check endpoint was called.")
     response = make_response(jsonify({"status": "healthy"}))
-    response.headers["Access-Control-Allow-Credentials"] = "true"
     return response, 200
 
 @app.route("/")
@@ -282,8 +281,6 @@ def login():
                 user_id = user["_id"]  # Get the user_id
                 logging.debug(f"Login successful for user_id: {user_id}")
                 response = jsonify({"message": "Login successful", "user_id": user_id})
-                response.headers["Access-Control-Allow-Credentials"] = "true"
-                response.headers["Access-Control-Allow-Origin"] = request.headers.get("Origin")
                 return response, 200
             else:
                 logging.warning("Invalid password provided")
