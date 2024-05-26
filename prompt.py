@@ -9,6 +9,8 @@ PROMPT_TO_ANALYSE_QUERY = """
         - "Do Siamese cats sleep a lot?"
         - "What does the Eiffel Tower look like at night?"
         - "Describe a bustling city street."
+        - "What is the distance of Mars from Earth?"
+        - "How far is the closest star to our solar system?"
 
     Generally, avoid using the generate_image function for non-specific or conversational queries such as but not limited to:
         - "Hi"
