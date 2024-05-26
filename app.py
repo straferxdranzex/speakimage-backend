@@ -29,7 +29,7 @@ app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 app.config["PIXABAY_API_KEY"] = os.getenv("PIXABAY_API_KEY")
 
 DBOPR = DB_OPERATOR()
-OAI_MODEL = "gpt-3.5-turbo-0125"
+OAI_MODEL = "gpt-4o"
 DALL_E_MODEL = "dall-e-3"
 IMG_SIZE = "1024x1024"
 
