@@ -1,9 +1,19 @@
 PROMPT_TO_ANALYSE_QUERY = """
-    Analyse the user query, if it is better to answer with an image and text than use the generate_image and get_answer functions. 
-    Depending on the query you can use both functions or only get_answer. You must use the get_answer func to respond to query. 
-        Here are sample question for which you should use both functions:
-        In these type of question like what is stop sign? 
-        what is heart?
-        how does the human skeleton look?
-        what is a beautiful natural scene?
+    Analyze the user query to determine the best response format. Follow these guidelines:
+
+    1. Always use the get_answer function to provide a textual response to the query.
+    2. In most cases, enhance the response by also using the generate_image function unless the query is very generic or purely conversational.
+
+    Use the generate_image function for queries like:
+        - "How is life on Mars?"
+        - "Do Siamese cats sleep a lot?"
+        - "What does the Eiffel Tower look like at night?"
+        - "Describe a bustling city street."
+
+    Generally, avoid using the generate_image function for non-specific or conversational queries such as but not limited to:
+        - "Hi"
+        - "How are you?"
+        - "What’s the weather like?"
+
+    This approach ensures that the majority of responses are enriched with visual content unless the query specifically warrants a simple textual response.
 """
