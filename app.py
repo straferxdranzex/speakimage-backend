@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["https://speakimage.ai", "http://localhost:3000"]}}, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["https://speakimage.ai", "http://localhost:3000"])
 
 app.secret_key = os.getenv("SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=15)
